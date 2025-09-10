@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools'],
+    install_requires=['setuptools'], 
     zip_safe=True,
     maintainer='robotics',
     maintainer_email='sujini7773@gmail.com',
@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'my_tf_1 = my_tf.my_tf_1:main',
             'my_tf_2 = my_tf.my_tf_2:main',
+            'child_frame = my_tf.child_frame:main',
         ],
     },
 )
