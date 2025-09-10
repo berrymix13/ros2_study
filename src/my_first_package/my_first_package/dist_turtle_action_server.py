@@ -11,6 +11,8 @@ from turtlesim.msg import Pose
 from geometry_msgs.msg import Twist
 from my_first_package.my_subscriber import TurtlesimSubscriber
 
+from rcl_interfaces.msg import SetParametersResult
+
 class TurtleSub_Action(TurtlesimSubscriber):
     def __init__(self, ac_server):
        super().__init__()
@@ -29,6 +31,37 @@ class DistTurtleServer(Node):
         self.previous_pose = Pose()
         self.publisher = self.create_publisher(Twist, '/turtle1/cmd_vel', 10)
         self.action_server = ActionServer(self, DistTurtle, 'dist_turtle', self.execute_callback)
+
+        self.get_logger().info("Dist turtle action server is started.")
+        self.declare_parameter('quantile_time', 0.75)
+        self.declare_parameter('almost_goal_time', 0.95)
+
+
+        (quantile_time, almost_goal_time) = self.get_parameters(
+                                        ['quantile_time', 'almost_goal_time'])
+        
+        
+        self.quantile_time = quantile_time.value
+        self.almost_goal_time = almost_goal_time.value
+
+        output_msg = "quantile time is "+str(self.quantile_time)+" and almost goal_time is "+str(self.almost_goal_time)+". "
+        self.get_logger().info(output_msg)
+                
+        self.add_on_set_parameters_callback(self.parameter_callback)
+
+    def parameter_callback(self, params):
+        for param in params:
+            print(param.name, " is changed to ", param.value)
+
+            if param.name == 'quantile_time':
+                self.quantile_time = param.value
+            if param.name == 'almost_goal_time':
+                self.almost_goal_time = param.value
+
+        output_msg = "quantile time is "+str(self.quantile_time)+" and almost goal_time is "+str(self.almost_goal_time)+". "
+        self.get_logger().info(output_msg)
+
+        return SetParametersResult(successful=True)
 
     def calc_diff_pose(self):
         if self.is_first_time:
@@ -55,7 +88,15 @@ class DistTurtleServer(Node):
             feedback_msg.remained_dist = goal_handle.request.dist - self.total_dist
             goal_handle.publish_feedback(feedback_msg)
             self.publisher.publish(msg)
-            time.sleep(0.1)
+
+            tmp = feedback_msg.remained_dist - goal_handle.request.dist + self.quantile_time
+            tmp = abs(tmp)
+
+            if tmp < 0.02:
+                output_msg = "The turtle passes the "+ str(self.quantile_time) + " point.: "+str(tmp)
+                self.get_logger().info(output_msg)
+            
+            time.sleep(0.01)
 
             if feedback_msg.remained_dist < 0.2:
                 break
