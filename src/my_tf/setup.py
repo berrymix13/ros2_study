@@ -23,6 +23,7 @@ setup(
             'my_tf_1 = my_tf.my_tf_1:main',
             'my_tf_2 = my_tf.my_tf_2:main',
             'child_frame = my_tf.child_frame:main',
+            'combined_frame = my_tf.combined_frame:main',
         ],
     },
 )
