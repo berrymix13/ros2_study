@@ -24,6 +24,7 @@ setup(
             'my_tf_2 = my_tf.my_tf_2:main',
             'child_frame = my_tf.child_frame:main',
             'combined_frame = my_tf.combined_frame:main',
+            'distance_world_child_publisher = my_tf.distance_world_child_publisher:main',
         ],
     },
 )
