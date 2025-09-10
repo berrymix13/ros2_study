@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'my_tf_1 = my_tf.my_tf_1:main',
+            'my_tf_2 = my_tf.my_tf_2:main',
         ],
     },
 )
